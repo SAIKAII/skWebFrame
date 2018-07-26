@@ -9,7 +9,7 @@ void start_server(SERVER_TYPE& server){
     //增加请求资源的处理方法
     
     //处理访问/string的POST请求，返回POST的字符串
-    server.resource["^/string/?&"]["POST"] = [](ostream& response, Request& request){
+    server.resource["^/string/?$"]["POST"] = [](ostream& response, Request& request){
         stringstream ss;
         //将请求内容读取到stringstream
         *request.content >> ss.rdbuf();
@@ -41,10 +41,10 @@ void start_server(SERVER_TYPE& server){
     };
 
     //处理默认GET请求，如果没有其他匹配成功，则这个匿名函数会被使用
-    //将应答web/目录及子目录中的文件
+    //将应答www/目录及子目录中的文件
     //默认文件：index.html
     server.default_resource["^/?(.*)$"]["GET"] = [](ostream& response, Request& request){
-       string filename = "web/";
+       string filename = "www/";
        string path = request.path_match[1];
        //防止使用".."来访问web/目录外的内容
        size_t last_pos = path.rfind(".");

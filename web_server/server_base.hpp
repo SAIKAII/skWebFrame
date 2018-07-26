@@ -56,7 +56,8 @@ namespace skWeb{
             std::vector<std::thread> threads;
     };
 
-    void ServerBase::start(){
+    template<typename socket_type>
+    void ServerBase<socket_type>::start(){
         //默认资源放在vector的末尾，用作默认应答
         //默认的请求会在找不到匹配请求路径时，进行访问，所以放在最后
         for(auto it = resource.begin(); it != resource.end(); ++it){
@@ -84,7 +85,8 @@ namespace skWeb{
             t.join();
     }
 
-    void ServerBase::process_request_and_respond(std::shared_ptr<socket_type> socket) const{
+    template<typename socket_type>
+    void ServerBase<socket_type>::process_request_and_respond(std::shared_ptr<socket_type> socket) const{
         auto read_buffer = std::make_shared<boost::asio::streambuf>();
 
         boost::asio::async_read_until(*socket, *read_buffer, "\r\n\r\n",
@@ -122,7 +124,8 @@ namespace skWeb{
                 });
     }
 
-    Request ServerBase::parse_request(std::istream& stream) const {
+    template<typename socket_type>
+    Request ServerBase<socket_type>::parse_request(std::istream& stream) const {
       Request request;
       //使用正则表达式，解析出请求方法、请求路径及HTTP版本
       std::regex regex_line("^([^ ]*) ([^ ]*) HTTP/([^ ]*)$");
@@ -142,7 +145,7 @@ namespace skWeb{
         bool matched;
         regex_line = "^([^:]*): ?(.*)$";
         do{
-            getine(stream, line);
+            getline(stream, line);
             line.pop_back();
             matched = std::regex_match(line, sub_match, regex_line);
             if(true == matched){
@@ -154,7 +157,8 @@ namespace skWeb{
       return request;
     }
 
-    void ServerBase::respond(std::shared_ptr<socket_type> socket, std::shared_ptr<Request> request) const{
+    template<typename socket_type>
+    void ServerBase<socket_type>::respond(std::shared_ptr<socket_type> socket, std::shared_ptr<Request> request) const{
         //对请求路径和方法进行匹配查找，并生成响应
         for(auto res_it : all_resources){
             std::regex e(res_it->first);
