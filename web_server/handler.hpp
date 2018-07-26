@@ -46,7 +46,7 @@ void start_server(SERVER_TYPE& server){
     server.default_resource["^/?(.*)$"]["GET"] = [](ostream& response, Request& request){
        string filename = "www/";
        string path = request.path_match[1];
-       //防止使用".."来访问web/目录外的内容
+       //防止使用".."来访问www/目录外的内容
        size_t last_pos = path.rfind(".");
        size_t current_pos = 0;
        size_t pos;
